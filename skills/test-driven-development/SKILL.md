@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: Use when implementing any feature or bugfix, before writing implementation code - write the test first, watch it fail, write minimal code to pass; ensures tests actually verify behavior by requiring failure first
+description: Use when implementing features or bugfixes in projects that use TDD - write the test first, watch it fail, write minimal code to pass; check project CLAUDE.md for whether TDD applies
 ---
 
 # Test-Driven Development (TDD)
@@ -11,22 +11,36 @@ Write the test first. Watch it fail. Write minimal code to pass.
 
 **Core principle:** If you didn't watch the test fail, you don't know if it tests the right thing.
 
-**Violating the letter of the rules is violating the spirit of the rules.**
-
 ## When to Use
 
-**Always:**
+**First, check if TDD applies to this project:**
+
+1. Check project `CLAUDE.md` for TDD guidance
+2. If CLAUDE.md says "no TDD" or "TDD optional" → Follow project guidance
+3. If no guidance → TDD is recommended for most software projects
+
+**TDD works well for:**
+- Web applications (Flask, Django, Angular, React, etc.)
+- APIs and backend services
+- Libraries and utilities
+- Most traditional software development
+
+**TDD may not apply to:**
+- Data Engineering pipelines (PySpark, Databricks, ETL)
+- Data Science / ML experimentation
+- Infrastructure as Code
+- Projects where CLAUDE.md opts out
+
+**When TDD applies, use it for:**
 - New features
 - Bug fixes
 - Refactoring
-- Behavior changes
+- Behaviour changes
 
 **Exceptions (ask your human partner):**
 - Throwaway prototypes
 - Generated code
 - Configuration files
-
-Thinking "skip TDD just this once"? Stop. That's rationalization.
 
 ## The Iron Law
 

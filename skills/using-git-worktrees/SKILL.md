@@ -1,142 +1,69 @@
 ---
 name: using-git-worktrees
-description: Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification
+description: Use when starting feature work that needs isolation - uses standard git branches instead of worktrees for simpler workflow with less overhead
 ---
 
-# Using Git Worktrees
+# Using Git Branches for Feature Work
 
 ## Overview
 
-Git worktrees create isolated workspaces sharing the same repository, allowing work on multiple branches simultaneously without switching.
+Use standard git branches for feature isolation. This provides sufficient isolation with a simpler workflow and less overhead than git worktrees.
 
-**Core principle:** Systematic directory selection + safety verification = reliable isolation.
+**Core principle:** Standard branches provide isolation without the complexity of multiple working directories.
 
-**Announce at start:** "I'm using the using-git-worktrees skill to set up an isolated workspace."
+**Announce at start:** "I'm using the using-git-worktrees skill to set up a feature branch."
 
-## Directory Selection Process
+## Branch Workflow
 
-Follow this priority order:
-
-### 1. Check Existing Directories
+### Step 1: Ensure Clean State
 
 ```bash
-# Check in priority order
-ls -d .worktrees 2>/dev/null     # Preferred (hidden)
-ls -d worktrees 2>/dev/null      # Alternative
+# Check for uncommitted changes
+git status
+
+# Stash if needed
+git stash push -m "WIP before feature branch"
 ```
 
-**If found:** Use that directory. If both exist, `.worktrees` wins.
-
-### 2. Check CLAUDE.md
+### Step 2: Update Base Branch
 
 ```bash
-grep -i "worktree.*director" CLAUDE.md 2>/dev/null
+git checkout main
+git pull origin main
 ```
 
-**If preference specified:** Use it without asking.
-
-### 3. Ask User
-
-If no directory exists and no CLAUDE.md preference:
-
-```
-No worktree directory found. Where should I create worktrees?
-
-1. .worktrees/ (project-local, hidden)
-2. ~/.config/superpowers/worktrees/<project-name>/ (global location)
-
-Which would you prefer?
-```
-
-## Safety Verification
-
-### For Project-Local Directories (.worktrees or worktrees)
-
-**MUST verify .gitignore before creating worktree:**
+### Step 3: Create Feature Branch
 
 ```bash
-# Check if directory pattern in .gitignore
-grep -q "^\.worktrees/$" .gitignore || grep -q "^worktrees/$" .gitignore
+git checkout -b feature/<feature-name>
 ```
 
-**If NOT in .gitignore:**
+**Branch naming conventions:**
+- `feature/<name>` - New features
+- `fix/<name>` - Bug fixes
+- `refactor/<name>` - Code refactoring
 
-Per Jesse's rule "Fix broken things immediately":
-1. Add appropriate line to .gitignore
-2. Commit the change
-3. Proceed with worktree creation
+### Step 4: Verify Clean Baseline
 
-**Why critical:** Prevents accidentally committing worktree contents to repository.
-
-### For Global Directory (~/.config/superpowers/worktrees)
-
-No .gitignore verification needed - outside project entirely.
-
-## Creation Steps
-
-### 1. Detect Project Name
+Run tests to ensure you start clean:
 
 ```bash
-project=$(basename "$(git rev-parse --show-toplevel)")
-```
-
-### 2. Create Worktree
-
-```bash
-# Determine full path
-case $LOCATION in
-  .worktrees|worktrees)
-    path="$LOCATION/$BRANCH_NAME"
-    ;;
-  ~/.config/superpowers/worktrees/*)
-    path="~/.config/superpowers/worktrees/$project/$BRANCH_NAME"
-    ;;
-esac
-
-# Create worktree with new branch
-git worktree add "$path" -b "$BRANCH_NAME"
-cd "$path"
-```
-
-### 3. Run Project Setup
-
-Auto-detect and run appropriate setup:
-
-```bash
-# Node.js
-if [ -f package.json ]; then npm install; fi
-
-# Rust
-if [ -f Cargo.toml ]; then cargo build; fi
-
-# Python
-if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-if [ -f pyproject.toml ]; then poetry install; fi
-
-# Go
-if [ -f go.mod ]; then go mod download; fi
-```
-
-### 4. Verify Clean Baseline
-
-Run tests to ensure worktree starts clean:
-
-```bash
-# Examples - use project-appropriate command
-npm test
-cargo test
-pytest
-go test ./...
+# Use project-appropriate command
+npm test        # Node.js
+pytest          # Python
+cargo test      # Rust
+go test ./...   # Go
 ```
 
 **If tests fail:** Report failures, ask whether to proceed or investigate.
 
 **If tests pass:** Report ready.
 
-### 5. Report Location
+### Step 5: Report Ready
 
 ```
-Worktree ready at <full-path>
+Feature branch ready: feature/<feature-name>
+Base: main (up to date)
 Tests passing (<N> tests, 0 failures)
 Ready to implement <feature-name>
 ```
@@ -145,69 +72,61 @@ Ready to implement <feature-name>
 
 | Situation | Action |
 |-----------|--------|
-| `.worktrees/` exists | Use it (verify .gitignore) |
-| `worktrees/` exists | Use it (verify .gitignore) |
-| Both exist | Use `.worktrees/` |
-| Neither exists | Check CLAUDE.md → Ask user |
-| Directory not in .gitignore | Add it immediately + commit |
-| Tests fail during baseline | Report failures + ask |
-| No package.json/Cargo.toml | Skip dependency install |
+| Starting new feature | Create branch from updated main |
+| Uncommitted changes exist | Stash or commit before branching |
+| Tests fail on clean branch | Investigate before proceeding |
+| Need to switch context | Commit/stash, checkout other branch |
+| Main has updates | Rebase or merge origin/main |
+
+## Context Switching
+
+When you need to work on something else:
+
+```bash
+# Option 1: Commit current work
+git add -A && git commit -m "WIP: description"
+git checkout other-branch
+
+# Option 2: Stash current work
+git stash push -m "WIP: feature-name"
+git checkout other-branch
+
+# Return later
+git checkout feature/<feature-name>
+git stash pop  # if stashed
+```
+
+## Keeping Branch Updated
+
+Periodically sync with main to avoid large merge conflicts:
+
+```bash
+git fetch origin
+git rebase origin/main
+# OR
+git merge origin/main
+```
 
 ## Common Mistakes
 
-**Skipping .gitignore verification**
-- **Problem:** Worktree contents get tracked, pollute git status
-- **Fix:** Always grep .gitignore before creating project-local worktree
+**Starting from outdated main**
+- **Problem:** Feature branch diverges significantly, painful merge later
+- **Fix:** Always pull main before creating feature branch
 
-**Assuming directory location**
-- **Problem:** Creates inconsistency, violates project conventions
-- **Fix:** Follow priority: existing > CLAUDE.md > ask
-
-**Proceeding with failing tests**
+**Not verifying clean baseline**
 - **Problem:** Can't distinguish new bugs from pre-existing issues
-- **Fix:** Report failures, get explicit permission to proceed
+- **Fix:** Run tests before starting work
 
-**Hardcoding setup commands**
-- **Problem:** Breaks on projects using different tools
-- **Fix:** Auto-detect from project files (package.json, etc.)
-
-## Example Workflow
-
-```
-You: I'm using the using-git-worktrees skill to set up an isolated workspace.
-
-[Check .worktrees/ - exists]
-[Verify .gitignore - contains .worktrees/]
-[Create worktree: git worktree add .worktrees/auth -b feature/auth]
-[Run npm install]
-[Run npm test - 47 passing]
-
-Worktree ready at /Users/jesse/myproject/.worktrees/auth
-Tests passing (47 tests, 0 failures)
-Ready to implement auth feature
-```
-
-## Red Flags
-
-**Never:**
-- Create worktree without .gitignore verification (project-local)
-- Skip baseline test verification
-- Proceed with failing tests without asking
-- Assume directory location when ambiguous
-- Skip CLAUDE.md check
-
-**Always:**
-- Follow directory priority: existing > CLAUDE.md > ask
-- Verify .gitignore for project-local
-- Auto-detect and run project setup
-- Verify clean test baseline
+**Large uncommitted changes when switching**
+- **Problem:** Risk losing work, messy stash history
+- **Fix:** Commit WIP or use meaningful stash messages
 
 ## Integration
 
 **Called by:**
-- **brainstorming** (Phase 4) - REQUIRED when design is approved and implementation follows
+- **brainstorming** (Phase 4) - When design is approved and implementation follows
 - Any skill needing isolated workspace
 
 **Pairs with:**
-- **finishing-a-development-branch** - REQUIRED for cleanup after work complete
-- **executing-plans** or **subagent-driven-development** - Work happens in this worktree
+- **finishing-a-development-branch** - For completing work
+- **executing-plans** or **subagent-driven-development** - Work happens on this branch

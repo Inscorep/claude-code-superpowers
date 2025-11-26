@@ -27,9 +27,11 @@ Before responding to ANY user message, you MUST complete this checklist:
 
 ## Critical Rules
 
-1. **Follow mandatory workflows.** Brainstorming before coding. Check for relevant skills before ANY task.
+1. **Follow recommended workflows.** Brainstorming before coding. Check for relevant skills before ANY task.
 
 2. Execute skills with the Skill tool
+
+3. **Check project CLAUDE.md for overrides.** Projects can opt out of specific workflows (e.g., TDD for data engineering).
 
 ## Common Rationalizations That Mean You're About To Fail
 
@@ -73,9 +75,9 @@ Before using a skill, announce that you are using it.
 
 # About these skills
 
-**Many skills contain rigid rules (TDD, debugging, verification).** Follow them exactly. Don't adapt away the discipline.
+**Many skills contain rigid rules (debugging, verification).** Follow them exactly. Don't adapt away the discipline.
 
-**Some skills are flexible patterns (architecture, naming).** Adapt core principles to your context.
+**Some skills are context-dependent (TDD, architecture, naming).** Check project CLAUDE.md for guidance, then adapt core principles to your context.
 
 The skill itself tells you which type it is.
 
@@ -83,7 +85,7 @@ The skill itself tells you which type it is.
 
 Your human partner's specific instructions describe WHAT to do, not HOW.
 
-"Add X", "Fix Y" = the goal, NOT permission to skip brainstorming, TDD, or RED-GREEN-REFACTOR.
+"Add X", "Fix Y" = the goal, NOT permission to skip brainstorming or other applicable workflows.
 
 **Red flags:** "Instruction was specific" • "Seems simple" • "Workflow is overkill"
 
