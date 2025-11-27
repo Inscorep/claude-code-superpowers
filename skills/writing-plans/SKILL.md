@@ -113,5 +113,5 @@ After saving the plan, offer execution choice:
 - Fresh subagent per task + code review
 
 **If Parallel Session chosen:**
-- Guide them to open new session in worktree
+- Guide them to open new session on the feature branch
 - **REQUIRED SUB-SKILL:** New session uses superpowers:executing-plans

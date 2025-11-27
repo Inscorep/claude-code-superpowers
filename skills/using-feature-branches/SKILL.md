@@ -1,17 +1,17 @@
 ---
-name: using-git-worktrees
-description: Use when starting feature work that needs isolation - uses standard git branches instead of worktrees for simpler workflow with less overhead
+name: using-feature-branches
+description: Use when starting feature work that needs isolation - creates feature branches with clean baseline verification and structured workflow
 ---
 
-# Using Git Branches for Feature Work
+# Using Feature Branches
 
 ## Overview
 
-Use standard git branches for feature isolation. This provides sufficient isolation with a simpler workflow and less overhead than git worktrees.
+Use standard git branches for feature isolation. This provides sufficient isolation with a simpler workflow.
 
-**Core principle:** Standard branches provide isolation without the complexity of multiple working directories.
+**Core principle:** Standard branches provide isolation for feature development.
 
-**Announce at start:** "I'm using the using-git-worktrees skill to set up a feature branch."
+**Announce at start:** "I'm using the using-feature-branches skill to set up a feature branch."
 
 ## Branch Workflow
 

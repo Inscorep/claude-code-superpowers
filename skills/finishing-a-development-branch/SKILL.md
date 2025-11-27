@@ -167,4 +167,4 @@ git branch -D <feature-branch>
 - **executing-plans** (Step 5) - After all batches complete
 
 **Pairs with:**
-- **using-git-worktrees** - Completes work on branch created by that skill
+- **using-feature-branches** - Completes work on branch created by that skill
