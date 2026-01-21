@@ -60,8 +60,8 @@ When modifying or creating skills:
 
 ## Testing
 
-No automated test suite. Skills are tested via subagent pressure scenarios as documented in `skills/testing-skills-with-subagents/SKILL.md`.
+No automated test suite. Skills are tested via subagent pressure scenarios as documented in `skills/writing-skills/testing-skills-with-subagents.md`.
 
 ## Version
 
-Current version: 3.5.1 (in `.claude-plugin/marketplace.json`)
+Current version: 4.0.3 (in `.claude-plugin/marketplace.json`)
